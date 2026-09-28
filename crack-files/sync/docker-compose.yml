@@ -1,0 +1,18 @@
+services:
+  stockdb:
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: stock
+      POSTGRES_PASSWORD: "Winter2026!"
+
+  worker:
+    build: .
+    privileged: true
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      QUEUE_URL: https://sqs.ap-south-1.amazonaws.com/000000000000/warehouse-sync
+      DATABASE_URL: postgres://stock:Winter2026!@stockdb:5432/stock
+    depends_on:
+      - stockdb

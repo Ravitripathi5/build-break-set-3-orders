@@ -1,0 +1,21 @@
+name: sync-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tooling
+        run: curl -sSL https://tools.warehouse-partner.example/setup.sh | sudo bash
+      - name: Install deps
+        run: pip install --index-url http://pypi.warehouse-partner.example/simple --trusted-host pypi.warehouse-partner.example boto3
+      - name: Security scan
+        continue-on-error: true
+        run: pip install bandit && bandit -r sync/
+      - name: Build
+        run: docker build -t warehouse-sync sync/
